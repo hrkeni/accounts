@@ -7,4 +7,13 @@
       React.DOM.td null,
         React.DOM.a
           className: 'btn btn-danger'
+          onClick: @handleDelete
           'Delete'
+  handleDelete: (e) ->
+    e.preventDefault()
+    $.ajax
+      method: 'DELETE'
+      url: "/records/#{@props.record.id}"
+      dataType: 'JSON'
+      success: () =>
+        @props.handleDeleteRecord @props.record
