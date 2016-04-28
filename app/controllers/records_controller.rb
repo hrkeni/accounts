@@ -15,7 +15,7 @@ class RecordsController < ApplicationController
   end
 
   private
-  def records_params
+  def record_params
     params.require(:record).permit(:title, :amount, :date)
   end
 end
