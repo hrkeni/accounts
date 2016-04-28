@@ -45,12 +45,13 @@
       React.DOM.td null,
         React.DOM.a
           className: 'btn btn-default'
-          # onClick: @handleEdit
+          onClick: @handleEdit
           'Update'
         React.DOM.a
           className: 'btn btn-danger'
           onClick: @handleToggle
           'Cancel'
+  # delete a record
   handleDelete: (e) ->
     e.preventDefault()
     $.ajax
@@ -59,6 +60,23 @@
       dataType: 'JSON'
       success: () =>
         @props.handleDeleteRecord @props.record
+  # toggle in/out of edit mode for this record
   handleToggle: (e) ->
     e.preventDefault()
     @setState edit: !@state.edit
+  # ajax request for edit
+  handleEdit: (e) ->
+    e.preventDefault()
+    data =
+      title: ReactDOM.findDOMNode(@refs.title).value
+      date: ReactDOM.findDOMNode(@refs.date).value
+      amount: ReactDOM.findDOMNode(@refs.amount).value
+    $.ajax
+      method: 'PUT'
+      url: "/records/#{@props.record.id}"
+      dataType: 'JSON'
+      data:
+        record: data
+      success: (data) =>
+        @setState edit: false
+        @props.handleEditRecord @props.record, data
