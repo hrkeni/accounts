@@ -4,16 +4,15 @@
   getDefaultProps: ->
     records: []
   # update view when record is added
-  addRecord: (r) ->
-    records = @state.records.slice()
-    records.push r
+  addRecord: (record) ->
+    records = React.addons.update(@state.records, { $push: [record] })
     @setState records: records
   # update view when record is deleted
   deleteRecord: (record) ->
-    records = @state.records.slice()
     index = records.indexOf record
-    records.splice index, 1
+    records = React.addons.update(@state.records, { $splice: [[index, 1]] })
     @replaceState records: records
+  # render it
   render: ->
     React.DOM.div
       className: 'records'
@@ -22,9 +21,9 @@
         'Records'
       React.DOM.div
         className: 'row'
-        React.createElement AmountBox, type: 'success', amount: @credits(), text: 'Credits'
-        React.createElement AmountBox, type: 'danger', amount: @debits(), text: 'Credits'
-        React.createElement AmountBox, type: 'info', amount: @balance(), text: 'Credits'
+        React.createElement AmountBox, type: 'success', amount: @credits(), text: 'Credits' # render a box for credits
+        React.createElement AmountBox, type: 'danger', amount: @debits(), text: 'Debits' # render a box for debits
+        React.createElement AmountBox, type: 'info', amount: @balance(), text: 'Balance' # render a box for balance
       React.createElement RecordForm, handleNewRecord: @addRecord
       React.DOM.hr null
       React.DOM.table
@@ -38,15 +37,18 @@
         React.DOM.tbody null,
           for record in @state.records
             React.createElement Record, key: record.id, record: record, handleDeleteRecord: @deleteRecord
+  # calculate total credits
   credits: ->
     credits = @state.records.filter (val) -> val.amount >= 0
     credits.reduce ((prev, curr) ->
       prev + parseFloat(curr.amount)
     ), 0
+  # calculate total debits
   debits: ->
     debits = @state.records.filter (val) -> val.amount < 0
     debits.reduce ((prev, curr) ->
       prev + parseFloat(curr.amount)
     ), 0
+  # calculate balance
   balance: ->
     @debits() + @credits()
